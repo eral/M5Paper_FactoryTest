@@ -216,26 +216,27 @@ int Frame_WifiScan::scan()
         cnt++;
     }
     
-    _key_wifi[wifi_num]->SetCustomString("_$refresh$_");
-    _key_wifi[wifi_num]->SetHide(false);
-    _key_wifi[wifi_num]->CanvasNormal()->fillCanvas(0);
-    _key_wifi[wifi_num]->CanvasNormal()->drawRect(0, 0, 532, 61, 15);
-    _key_wifi[wifi_num]->CanvasNormal()->pushImage(15, 14, 32, 32, ImageResource_item_icon_refresh_32x32);
+    int btn_idx_refresh = wifi_num + 0;
+    _key_wifi[btn_idx_refresh]->SetCustomString("_$refresh$_");
+    _key_wifi[btn_idx_refresh]->SetHide(false);
+    _key_wifi[btn_idx_refresh]->CanvasNormal()->fillCanvas(0);
+    _key_wifi[btn_idx_refresh]->CanvasNormal()->drawRect(0, 0, 532, 61, 15);
+    _key_wifi[btn_idx_refresh]->CanvasNormal()->pushImage(15, 14, 32, 32, ImageResource_item_icon_refresh_32x32);
     if(_language == LANGUAGE_JA)
     {
-        _key_wifi[wifi_num]->CanvasNormal()->drawString("刷新", 58, 35);
+        _key_wifi[btn_idx_refresh]->CanvasNormal()->drawString("刷新", 58, 35);
     }
     else if(_language == LANGUAGE_ZH)
     {
-        _key_wifi[wifi_num]->CanvasNormal()->drawString("刷新", 58, 35);
+        _key_wifi[btn_idx_refresh]->CanvasNormal()->drawString("刷新", 58, 35);
     }
     else
     {
-        _key_wifi[wifi_num]->CanvasNormal()->drawString("Refresh", 58, 35);
+        _key_wifi[btn_idx_refresh]->CanvasNormal()->drawString("Refresh", 58, 35);
     }
-    *(_key_wifi[wifi_num]->CanvasPressed()) = *(_key_wifi[wifi_num]->CanvasNormal());
-    _key_wifi[wifi_num]->CanvasPressed()->ReverseColor();
-    _key_wifi[wifi_num]->Draw(UPDATE_MODE_A2);
+    *(_key_wifi[btn_idx_refresh]->CanvasPressed()) = *(_key_wifi[btn_idx_refresh]->CanvasNormal());
+    _key_wifi[btn_idx_refresh]->CanvasPressed()->ReverseColor();
+    _key_wifi[btn_idx_refresh]->Draw(UPDATE_MODE_A2);
 
     M5.EPD.UpdateFull(UPDATE_MODE_GL16);
     // M5.EPD.UpdateArea(0, 64, 540, 72, UPDATE_MODE_GL16);

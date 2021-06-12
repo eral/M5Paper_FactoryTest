@@ -1,9 +1,10 @@
 #include "frame_wifiscan.h"
+#include "frame_wifissid.h"
 #include "frame_wifipassword.h"
 #include <WiFi.h>
 
 #define MAX_BTN_NUM     14
-#define MAX_WIFI_NUM    (MAX_BTN_NUM - 1)
+#define MAX_WIFI_NUM    (MAX_BTN_NUM - 2)
 bool _update_flag = false;
 EPDGUI_Button *_connect_key = NULL;
 
@@ -19,6 +20,18 @@ void key_wifi_cb(epdgui_args_vector_t &args)
     if(((EPDGUI_Button*)(args[0]))->GetCustomString() == "_$refresh$_")
     {
         _update_flag = true;
+    }
+    else if(((EPDGUI_Button*)(args[0]))->GetCustomString() == "_$hidden_ssid$_")
+    {
+        _connect_key = (EPDGUI_Button*)(args[0]);
+        Frame_Base *frame = EPDGUI_GetFrame("Frame_WifiSSID");
+        if(frame == NULL)
+        {
+            frame = new Frame_WifiSSID(false);
+            EPDGUI_AddFrame("Frame_WifiSSID", frame);
+        }
+        EPDGUI_PushFrame(frame);
+        *((int*)(args[1])) = 0;
     }
     else
     {
@@ -216,7 +229,28 @@ int Frame_WifiScan::scan()
         cnt++;
     }
     
-    int btn_idx_refresh = wifi_num + 0;
+    int btn_idx_hidden_ssid = wifi_num + 0;
+    _key_wifi[btn_idx_hidden_ssid]->SetCustomString("_$hidden_ssid$_");
+    _key_wifi[btn_idx_hidden_ssid]->SetHide(false);
+    _key_wifi[btn_idx_hidden_ssid]->CanvasNormal()->fillCanvas(0);
+    _key_wifi[btn_idx_hidden_ssid]->CanvasNormal()->drawRect(0, 0, 532, 61, 15);
+    if(_language == LANGUAGE_JA)
+    {
+        _key_wifi[btn_idx_hidden_ssid]->CanvasNormal()->drawString("― SSID Stealth ―", 15, 35);
+    }
+    else if(_language == LANGUAGE_ZH)
+    {
+        _key_wifi[btn_idx_hidden_ssid]->CanvasNormal()->drawString("─ 隐藏SSID ─", 15, 35);
+    }
+    else
+    {
+        _key_wifi[btn_idx_hidden_ssid]->CanvasNormal()->drawString("- hidden SSID -", 15, 35);
+    }
+    *(_key_wifi[btn_idx_hidden_ssid]->CanvasPressed()) = *(_key_wifi[btn_idx_hidden_ssid]->CanvasNormal());
+    _key_wifi[btn_idx_hidden_ssid]->CanvasPressed()->ReverseColor();
+    _key_wifi[btn_idx_hidden_ssid]->Draw(UPDATE_MODE_A2);
+    
+    int btn_idx_refresh = wifi_num + 1;
     _key_wifi[btn_idx_refresh]->SetCustomString("_$refresh$_");
     _key_wifi[btn_idx_refresh]->SetHide(false);
     _key_wifi[btn_idx_refresh]->CanvasNormal()->fillCanvas(0);
@@ -339,6 +373,16 @@ int Frame_WifiScan::init(epdgui_args_vector_t &args)
     _connect = false;
     M5.EPD.WriteFullGram4bpp(GetWallpaper());
     _canvas_title->pushCanvas(0, 8, UPDATE_MODE_NONE);
+    if(args.size() > 1)
+    {
+        String *ssid = (String*)(args[1]);
+        _connect_ssid = *ssid;
+        delete ssid;
+        args.pop_back();
+        if (args[0] == NULL) {
+            args.pop_back();
+        }
+    }
     if(args.size() > 0)
     {
         String *password = (String*)(args[0]);

@@ -8,6 +8,7 @@
 #include "frame_keyboard.h"
 #include "frame_factorytest.h"
 #include "frame_wifiscan.h"
+#include "frame_wifissid.h"
 #include "frame_wifipassword.h"
 #include "frame_lifegame.h"
 #include "frame_fileindex.h"

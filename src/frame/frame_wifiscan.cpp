@@ -375,9 +375,11 @@ int Frame_WifiScan::init(epdgui_args_vector_t &args)
     _canvas_title->pushCanvas(0, 8, UPDATE_MODE_NONE);
     if(args.size() > 1)
     {
-        String *ssid = (String*)(args[1]);
-        _connect_ssid = *ssid;
-        delete ssid;
+        if (_connect_key != NULL) {
+            String *ssid = (String*)(args[1]);
+            _connect_key->SetCustomString(*ssid);
+            delete ssid;
+        }
         args.pop_back();
         if (args[0] == NULL) {
             args.pop_back();

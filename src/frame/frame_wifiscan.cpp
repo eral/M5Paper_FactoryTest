@@ -3,7 +3,7 @@
 #include "frame_wifipassword.h"
 #include <WiFi.h>
 
-#define MAX_BTN_NUM     14
+#define MAX_BTN_NUM     13
 #define MAX_WIFI_NUM    (MAX_BTN_NUM - 2)
 bool _update_flag = false;
 EPDGUI_Button *_connect_key = NULL;
@@ -84,12 +84,43 @@ Frame_WifiScan::Frame_WifiScan(void)
     _key_exit->AddArgs(EPDGUI_Button::EVENT_RELEASED, 0, (void*)(&_is_run));
     _key_exit->Bind(EPDGUI_Button::EVENT_RELEASED, &Frame_Base::exit_cb);
 
+    {
+        if(_language == LANGUAGE_JA)
+        {
+            _mac_adrs_str = "MACアドレス:    ";
+        }
+        else if(_language == LANGUAGE_ZH)
+        {
+            _mac_adrs_str = "MAC地址:    ";
+        }
+        else
+        {
+            _mac_adrs_str = "MAC address:    ";
+        }
+        uint8_t mac[6];
+        esp_read_mac(mac, ESP_MAC_WIFI_STA);
+        char macStr[18];
+        sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+        _mac_adrs_str += macStr;
+    }
+    int16_t _canvas_title_height = _canvas_title->height();
+    _mac_adrs = new EPDGUI_Button(0, 960 - _canvas_title_height, 540, _canvas_title_height);
+    _mac_adrs->SetHide(true);
+    _mac_adrs->CanvasNormal()->setTextSize(26);
+    _mac_adrs->CanvasNormal()->setTextDatum(CL_DATUM);
+    _mac_adrs->CanvasNormal()->setTextColor(15);
+    _mac_adrs->CanvasNormal()->fillCanvas(0);
+    _mac_adrs->CanvasNormal()->drawRect(0, 0, 540, _canvas_title_height, 15);
+    _mac_adrs->CanvasNormal()->drawString(_mac_adrs_str.c_str(), 15, 35);
+
     _update_flag = true;
     _connected = 0;
 }
 
 Frame_WifiScan::~Frame_WifiScan(void)
 {
+    delete _mac_adrs;
+
     for(int i = 0; i < MAX_BTN_NUM; i++)
     {
         delete _key_wifi[i];
@@ -151,6 +182,7 @@ int Frame_WifiScan::scan()
         M5.EPD.WriteFullGram4bpp(GetWallpaper());
         _canvas_title->pushCanvas(0, 8, UPDATE_MODE_NONE);
         _key_exit->Draw(UPDATE_MODE_NONE);
+        _mac_adrs->Draw(UPDATE_MODE_NONE);
         M5.EPD.UpdateFull(UPDATE_MODE_GC16);
     }
     _scan_count++;
@@ -416,6 +448,8 @@ int Frame_WifiScan::init(epdgui_args_vector_t &args)
         _connect = false;
     }
     EPDGUI_AddObject(_key_exit);
-    
+    _mac_adrs->SetHide(false);
+    EPDGUI_AddObject(_mac_adrs);
+   
     return 3;
 }

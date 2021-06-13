@@ -18,6 +18,8 @@ public:
 
 private:
     EPDGUI_Button *_key_wifi[14];
+    EPDGUI_Button *_mac_adrs;
+    String _mac_adrs_str;
     uint8_t _language;
     uint32_t _scan_count = 0;
     bool _connect;

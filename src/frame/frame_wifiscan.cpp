@@ -326,6 +326,7 @@ void Frame_WifiScan::Connect()
                 err.drawString("Wrong password", 150, 55);
             }
             err.pushCanvas(120, 430, UPDATE_MODE_GL16);
+            WiFi.disconnect();
             return;
         }
     }
